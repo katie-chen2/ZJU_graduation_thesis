@@ -2,6 +2,7 @@
 The codebase for my undergraduate graduation thesis project. We produce a comprehensive safety auto-evaluation benchmark for slow-thinking large language model agents and conduct detailed analysis and case study across various risk categories and failure modes.
 
 ![overview](./documents/overview.png)
+<center>Evaluation Framework</center>
 
 ## News
 **🎉 `2025/05/29`:** The code, data, and thesis paper is publicly available.
