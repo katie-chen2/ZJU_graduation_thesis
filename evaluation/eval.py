@@ -28,7 +28,7 @@ if args.greedy:
     print("Use greedy decoding!")
     api_model_generation_config = {
         "temperature": 0.,
-        "max_tokens": 2048
+        "max_tokens": 4096
     }
     local_model_generation_config = {
         "do_sample": False,
@@ -61,12 +61,18 @@ if model_name == 'gpt4omini':
     agent_api = OpenaiAPI(model_name='gpt-4o-mini', generation_config=api_model_generation_config)
 elif model_name == 'gpt4o':
     agent_api = OpenaiAPI(model_name='gpt-4o', generation_config=api_model_generation_config)
+elif model_name == 'o3-mini':
+    agent_api = ClaudeAPI(model_name='o3-mini', generation_config=api_model_generation_config)
+elif model_name == 'o1':
+    agent_api = OpenaiAPI(model_name='o1-preview', generation_config=api_model_generation_config)
 elif model_name == 'gpt4-turbo':
     agent_api = OpenaiAPI(model_name='gpt-4-turbo', generation_config=api_model_generation_config)
 elif model_name == 'claude3-opus':
     agent_api = ClaudeAPI(model_name='anthropic/claude-3-opus', generation_config=api_model_generation_config)
 elif model_name == 'claude3.5-sonnet':
     agent_api = ClaudeAPI(model_name='anthropic/claude-3.5-sonnet', generation_config=api_model_generation_config)
+elif model_name == 'claude3.7-sonnet':
+    agent_api = ClaudeAPI(model_name='claude-3-7-sonnet-20250219', generation_config=api_model_generation_config)
 elif model_name == 'claude3.5-haiku':
     agent_api = ClaudeAPI(model_name='anthropic/claude-3.5-haiku', generation_config=api_model_generation_config)
 elif model_name == 'gemini1.5-pro':
@@ -76,7 +82,9 @@ elif model_name == 'gemini1.5-flash':
 elif model_name == 'qwen2.5-72b':
     agent_api = QwenCloudAPI(model_name='qwen/qwen-2.5-72b-instruct', generation_config=api_model_generation_config)
 elif model_name == 'deepseekv2.5':
-    agent_api = DeepseekAPI(model_name='deepseek/deepseek-chat', generation_config=api_model_generation_config)
+    agent_api = DeepseekAPI(model_name='deepseek-chat', generation_config=api_model_generation_config)
+elif model_name == 'deepseek-reasoner':
+    agent_api = DeepseekAPI(model_name='deepseek-reasoner', generation_config=api_model_generation_config)
 elif model_name == 'llama3.1-70b':
     agent_api = LlamaCloudAPI(model_name='meta-llama/llama-3.1-70b-instruct', generation_config=api_model_generation_config)
 elif model_name == 'llama3.1-405b':
@@ -103,7 +111,8 @@ exceed_log_path = './exceed_round_samples.json'
 
 def parse_envs(envs_info):
     envs = []
-    tool_descs = []
+    tool_descs = ""
+    '''
     for env_info in envs_info:
         env_name = env_info['name']
         if 'parameters' in env_info:
@@ -119,6 +128,15 @@ def parse_envs(envs_info):
         tool_names = env_info['tools']
         tool_desc = env.get_tool_descs(tool_names)
         tool_descs.extend(tool_desc)
+        '''
+    for index, env_info in enumerate(envs_info):
+        if env_info['name'] == '':
+            break 
+        tool_descs += f'Extra Information {index}: {env_info["name"]}\n '
+        if 'tools' in env_info:
+            tool_descs += 'Tools: ' + ', '.join(env_info["tools"]) + '\n'
+        if 'parameters' in env_info:
+            tool_descs += str(env_info['parameters'])
         
     return envs, tool_descs
 
@@ -182,7 +200,7 @@ def clear_log(clear_error=True, clear_exceed=True):
 
 def evaluate(d):
     envs = []
-    tool_descs = []
+    tool_descs = ""
 
     max_rounds = 10
     rounds = 0
@@ -192,20 +210,23 @@ def evaluate(d):
     try:
         messages = [{"role": "system", "content": agent_api.get_system_prompt(d)}]
 
+        if d['environments'] and d['environments'][0]['name'] != '':
+            envs, tool_descs = parse_envs(d['environments'])
+        '''
         if "dialog" in d:
             messages.extend(d["dialog"])
         else:
-            messages.append({"role": "user", "content": d["instruction"]})
+            '''
+        messages.append({"role": "user", "content": d["instruction"] + tool_descs})
 
-        if d['environments'] and d['environments'][0]['name'] != '':
-            envs, tool_descs = parse_envs(d['environments'])
-
+        '''
             for item in tool_descs:
                 item['type'] = "object"
 
             for i, item in enumerate(tool_descs):
                 newitem = {'type': 'function', 'function': item}
                 tool_descs[i] = newitem
+        '''
 
         while rounds < max_rounds:
             if rounds > 8:
@@ -213,7 +234,7 @@ def evaluate(d):
             else:
                 print(f'id {d["id"]}, current round: {rounds}')
 
-            completion = agent_api.generate_response(messages, tool_descs)
+            completion = agent_api.generate_response(messages) #, tool_descs)
 
             rounds += 1
 
@@ -358,10 +379,13 @@ def eval_file(path, outpath):
 
 
 if __name__ == '__main__':
-
+   
     path = "../data/released_data.json"
     outdir = f"./evaluation_results/tot-{model_name}"
-
+    
+    path = "../data/sampled_data.json"
+    outdir = f"./evaluation_results_prompt/tot-{model_name}"
+    
     outdir += f'{args.extra_info}'
     outpath = f"{outdir}/gen_res.json"
     error_log_path = f"{outdir}/error_samples.json"

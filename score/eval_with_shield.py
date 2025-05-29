@@ -214,8 +214,8 @@ def load_cache_data(model_name, filename, anno_label, label_type, target_model_n
 
     # Existing results
     existing_ids = []
-    if os.path.exists(f"./shield_results/{model_name}/{target_model_name}_{filename}_{label_type}outputs_results.json"):
-        with open(f"./shield_results/{model_name}/{target_model_name}_{filename}_{label_type}outputs_results.json", "r") as f:
+    if os.path.exists(f"./shield_results_prompt/{model_name}/{target_model_name}_{filename}_{label_type}outputs_results.json"):
+        with open(f"./shield_results_prompt/{model_name}/{target_model_name}_{filename}_{label_type}outputs_results.json", "r") as f:
             results = json.load(f)
             for item in results:
                 existing_ids.append(item["id"])
@@ -304,13 +304,13 @@ def run_each_file(filename, filepath, formatted_timestamp, model_name, eval_mode
         else:
             fail_cases.append(save_res)
 
-    path = f"./shield_results/{model_name}"
+    path = f"./shield_results_prompt/{model_name}"
     if not os.path.exists(path):
         os.mkdir(path)
-    with open(f"./shield_results/{model_name}/{target_model_name}_{filename}_{label_type}outputs_results.json", 'w') as f:
+    with open(f"./shield_results_prompt/{model_name}/{target_model_name}_{filename}_{label_type}outputs_results.json", 'w') as f:
         json.dump(final_results, f, indent=4)
     if fail_cases:
-        with open(f"./shield_results/{model_name}/{target_model_name}_{filename}_{label_type}outputs_fail_cases.json", 'w') as f:
+        with open(f"./shield_results_prompt/{model_name}/{target_model_name}_{filename}_{label_type}outputs_fail_cases.json", 'w') as f:
             json.dump(fail_cases, f, indent=4)
 
 
@@ -346,8 +346,8 @@ def main():
     model, tokenizer, device = create_model_tokenizer(model_path, tokenizer_path)
 
     model_name = args.target_model_name
-    if not os.path.exists(f'./shield_results/{model_name}/'):
-        os.makedirs(f'./shield_results/{model_name}/')
+    if not os.path.exists(f'./shield_results_prompt/{model_name}/'):
+        os.makedirs(f'./shield_results_prompt/{model_name}/')
 
     filepath = args.filepath
 
@@ -361,7 +361,7 @@ def main():
     all_pred.extend(pred)
 
     logging.basicConfig(level=logging.DEBUG,
-                    filename=f'./shield_results/{model_name}/{args.target_model_name}_{filename}_{args.label_type}outputs_log.txt',
+                    filename=f'./shield_results_prompt/{model_name}/{args.target_model_name}_{filename}_{args.label_type}outputs_log.txt',
                     filemode='w',
                     format='' )
 

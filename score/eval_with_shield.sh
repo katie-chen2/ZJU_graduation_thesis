@@ -1,3 +1,8 @@
-CUDA_VISIBLE_DEVICES=0 python eval_with_shield.py --model_path thu-coai/ShieldAgent --filepath ../evaluation/evaluation_results/tot-gpt4o --filename gen_res.json --label_type "" --batch_size 40 --target_model_name gpt4o
-
-CUDA_VISIBLE_DEVICES=0 python eval_with_shield.py --model_path thu-coai/ShieldAgent --filepath ../evaluation/evaluation_results/tot-qwen2.5-7b --filename gen_res.json --label_type "" --batch_size 40 --target_model_name qwen2.5-7b
+CUDA_VISIBLE_DEVICES=0 python eval_with_shield.py --model_path ~/ShieldAgent --filepath ../evaluation/evaluation_results_prompt/tool-call-o1 --filename gen_res.json --label_type "" --batch_size 4 --target_model_name o1
+CUDA_VISIBLE_DEVICES=0 python eval_with_shield.py --model_path ~/ShieldAgent --filepath ../evaluation/evaluation_results_prompt/tool-call-o3-mini --filename gen_res.json --label_type "" --batch_size 4 --target_model_name o3-mini
+CUDA_VISIBLE_DEVICES=0 python eval_with_shield.py --model_path ~/ShieldAgent --filepath ../evaluation/evaluation_results_prompt/tool-call-deepseek-reasoner --filename gen_res.json --label_type "" --batch_size 4 --target_model_name deepseek-reasoner
+CUDA_VISIBLE_DEVICES=0 python eval_with_shield.py --model_path ~/ShieldAgent --filepath ../evaluation/evaluation_results_prompt/tool-call-claude3.7-sonnet --filename gen_res.json --label_type "" --batch_size 4 --target_model_name claude3.7-sonnet
+CUDA_VISIBLE_DEVICES=0 python eval_with_shield.py --model_path ~/ShieldAgent --filepath ../evaluation/evaluation_results/tool-call-claude3.7-sonnet --filename gen_res.json --label_type "" --batch_size 2 --target_model_name claude3.7-sonnet
+CUDA_VISIBLE_DEVICES=0 python eval_with_shield.py --model_path ~/ShieldAgent --filepath ../evaluation/evaluation_results/tool-call-o1 --filename gen_res.json --label_type "" --batch_size 2 --target_model_name o1
+CUDA_VISIBLE_DEVICES=0 python eval_with_shield.py --model_path ~/ShieldAgent --filepath ../evaluation/evaluation_results/tool-call-o3-mini --filename gen_res.json --label_type "" --batch_size 2 --target_model_name o3-mini
+CUDA_VISIBLE_DEVICES=0 python eval_with_shield.py --model_path ~/ShieldAgent --filepath ../evaluation/evaluation_results/tool-call-deepseek-reasoner --filename gen_res.json --label_type "" --batch_size 2 --target_model_name deepseek-reasoner

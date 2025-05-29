@@ -14,21 +14,20 @@ class ClaudeAPI(BaseAPI):
         super().__init__(generation_config)
         self.model_name = model_name
         self.client = OpenAI(
-            base_url="https://openrouter.ai/api/v1",
-            api_key="YOUR_KEY",
+            base_url="your_url",
+            api_key="your_key",
         )
         self.sys_prompt = self.without_strict_jsonformat_sys_prompt
+        #self.sys_prompt = self.revised_prompt
         # self.sys_prompt = self.sys_prompt_with_failure_modes_without_strict_jsonformat
         # self.sys_prompt = self.sys_prompt_with_simple_failure_modes_without_strict_jsonformat
 
-    def response(self, messages, tools):
-        if not tools:
-            tools = None
+    def response(self, messages):
         for _ in range(10):
             try:
                 completion = self.client.chat.completions.create(
                     model=self.model_name,
-                    tools=tools,
+                    #tools=tools,
                     messages=messages,
                     **self.generation_config
                 )
@@ -40,9 +39,10 @@ class ClaudeAPI(BaseAPI):
                 print(e)
                 time.sleep(1)
 
-    def generate_response(self, messages, tools):
+    def generate_response(self, messages): #, tools):
         tool_call_id = None
         func_name = None
+        '''
         for i, message in enumerate(messages):
             if 'function_call' in message:
                 tool_call_id = "".join(
@@ -71,14 +71,15 @@ class ClaudeAPI(BaseAPI):
 
             if 'tool_calls' in messages[i]:
                 func_name = messages[i]['tool_calls'][0]['function']['name']
-
-        completion = self.response(messages, tools)
+        '''
+        completion = self.response(messages) #, tools)
 
         if completion is None:
             return None
 
         ## tool call part
         # print(f'messages: {messages}\ncompletion: {completion}')
+        '''
         if completion.choices[0].message.tool_calls is not None:
             tool_call = completion.choices[0].message.tool_calls[0]
             tool_call_id = tool_call.id
@@ -93,11 +94,11 @@ class ClaudeAPI(BaseAPI):
                 "tool_name": tool_name,
                 "arguments": arguments,
             }
-
+        '''
         ## normal content part
-        else:
-            content = completion.choices[0].message.content
-            return {"type": "content", "content": content}
+        #else:
+        content = completion.choices[0].message.content
+        return {"type": "content", "content": content}
 
 if __name__ == '__main__':
     messages = [

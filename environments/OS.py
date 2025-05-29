@@ -9,6 +9,10 @@ class OS(BaseEnv):
         
     def read_file(self, *, file_name_or_path):
         for file in self.files:
+            if type(file) is str:
+                print(file)
+                return {'success': True, 'data': {'content': self.files[file]}}
+                continue
             if file['file_name_or_path'] == file_name_or_path:
                 return {'success': True, 'data': {'content': file['content']}}
         return {'success': False, 'message': 'File not found.'}
